@@ -1,5 +1,6 @@
 use std::io;
 use rand::Rng;
+use std::cmp::Ordering;
 
 fn main() {
 
@@ -11,7 +12,7 @@ fn main() {
         
         println!("\nBienvenido a adivina el numero\n");
     
-        let numero_secreto: u8 = rand::thread_rng().gen_range(1..=100);
+        let numero_secreto: u8 = rand::rng().random_range(1..=100);
     
         while vidas > 0 {
             
@@ -23,24 +24,28 @@ fn main() {
                 .read_line(&mut numero_1)
                 .expect("No se pudo leer el numero");
         
-            if numero_1.trim().parse::<u8>().unwrap() == numero_secreto {
-                println!("¡Correcto! Has adivinado el numero.");
-                break;
-            } else if numero_1.trim().parse::<u8>().unwrap() > numero_secreto {
-                println!("¡Incorrecto! El numero es menor. Intentalo de nuevo.");
-                vidas -= 1;
-            } else {
-                println!("¡Incorrecto! El numero es mayor. Intentalo de nuevo.");
-                vidas -= 1;
+            let numero_1: u8 = numero_1.trim().parse().expect("Ingresa el número: ");
+
+            match numero_1.cmp(&numero_secreto) {
+                Ordering::Less => {println!("El número es mayor");
+                    vidas = vidas - 1;
+                },
+                Ordering::Greater => {println!("El número es menor");
+                    vidas = vidas - 1;
+                },
+                Ordering::Equal => {println!("Ganaste!");
+                    break;
+                },
             }
         
-            println!("Te quedan {} vidas", vidas);
-
+            
             if vidas == 0 {
                 println!("\n¡Game Over! Has perdido.\n");
                 println!("El numero secreto era: {}", numero_secreto);
                 break;
             }
+
+            println!("Te quedan {} vidas", vidas);
         }
         
         println!("\n¿Quieres jugar de nuevo?:\n");
